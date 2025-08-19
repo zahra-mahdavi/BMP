@@ -8,7 +8,7 @@
 using LocVec = std::vector<uint32_t>;
 
 struct TraversalBMP {
-    // For each position i in the chain (0..nvars-1), choose M0 or M1 by input bit x[i].
+    
     std::vector<LocVec> M0_loc;
     std::vector<LocVec> M1_loc;
     std::vector<uint8_t> R_bits; // length = cols of rightmost matrix
