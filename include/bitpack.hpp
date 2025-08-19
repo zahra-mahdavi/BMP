@@ -5,8 +5,7 @@
 #include <cstring>
 #include <algorithm>
 
-// Simple bit-packed boolean vector & matrix for boolean semiring (OR-AND).
-// Vector is stored as 64-bit words; bit i represents entry i.
+
 struct PackedVector {
     std::vector<uint64_t> words;
     size_t nbits = 0;
@@ -27,7 +26,7 @@ struct PackedVector {
     }
 };
 
-// PackedMatrix: rows x cols, row-major by 64-bit word-chunks across columns.
+
 struct PackedMatrix {
     size_t rows = 0, cols = 0;
     size_t words_per_row = 0;
@@ -48,7 +47,7 @@ struct PackedMatrix {
         p[c>>6] |= (1ULL << (c&63));
     }
 
-    // For row-switch matrices, each row has exactly one 1; return its column index.
+    
     // If multiple bits set, returns the first.
     inline size_t row_switch_col(size_t r) const {
         const uint64_t* p = row_ptr(r);
@@ -65,9 +64,8 @@ struct PackedMatrix {
     }
 };
 
-// y = A ⊗ x  under boolean semiring (AND then OR across columns).
-// That is: y_i = OR_j (A_ij & x_j).
-// Requires: x.nbits == A.cols and y.nbits == A.rows.
+
+
 inline void bool_matvec_cpu(const PackedMatrix& A, const PackedVector& x, PackedVector& y){
     assert(x.nbits == A.cols);
     if(y.nbits != A.rows){
@@ -87,7 +85,7 @@ inline void bool_matvec_cpu(const PackedMatrix& A, const PackedVector& x, Packed
     }
 }
 
-// Convenience: apply selected matrix from array M[i] depending on input bit b (0/1).
+
 inline void select_and_apply(const std::vector<PackedMatrix>& M0,
                              const std::vector<PackedMatrix>& M1,
                              const std::vector<int>& x_bits,
@@ -102,7 +100,7 @@ inline void select_and_apply(const std::vector<PackedMatrix>& M0,
     }
 }
 
-// Build a random row-switch matrix of size r x c (each row has exactly one 1).
+
 inline PackedMatrix random_row_switch_matrix(size_t r, size_t c) {
     PackedMatrix A(r,c);
     for(size_t i=0;i<r;++i){
