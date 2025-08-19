@@ -23,7 +23,7 @@ inline std::vector<uint8_t> packedvec_to_bits(const PackedVector& v){
     return bits;
 }
 
-// Build TraversalBMP from arrays of PackedMatrix (assumed row-switch matrices) and R (bit vector).
+
 inline TraversalBMP build_traversal(const std::vector<PackedMatrix>& M0,
                                     const std::vector<PackedMatrix>& M1,
                                     const PackedVector& R){
