@@ -9,7 +9,7 @@
 
 
 struct BMPPositional {
-    std::vector<std::vector<uint32_t>> T; // T[k][r] = c (1-based), r in [0..rows_k-1]
+    std::vector<std::vector<uint32_t>> T; 
     std::vector<int> R;                   // size 2, values {0,1}
 };
 
@@ -32,8 +32,7 @@ inline BMPPositional load_bmp_dat(const std::string& path){
     }
     if(lines.size() < 3) throw std::runtime_error("Unexpected .dat format: too few lines");
 
-    // Line 1: initial rows enumeration (ignored)
-    // Line 2: R vector (expected 2 ints)
+    
     std::vector<int> R = split_ints(lines[1]);
     if(R.size() != 2) throw std::runtime_error("Expected R of size 2 on line 2");
 
