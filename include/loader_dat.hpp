@@ -10,7 +10,7 @@
 
 struct BMPPositional {
     std::vector<std::vector<uint32_t>> T; 
-    std::vector<int> R;                   // size 2, values {0,1}
+    std::vector<int> R;                   
 };
 
 inline std::vector<int> split_ints(const std::string& s){
@@ -32,11 +32,12 @@ inline BMPPositional load_bmp_dat(const std::string& path){
     }
     if(lines.size() < 3) throw std::runtime_error("Unexpected .dat format: too few lines");
 
-    
+    // Line 1: initial rows enumeration 
+    // Line 2: R vector 
     std::vector<int> R = split_ints(lines[1]);
     if(R.size() != 2) throw std::runtime_error("Expected R of size 2 on line 2");
 
-    
+    // Build pairs 
     std::vector<std::vector<uint32_t>> T;
     for(size_t i=2;i+1<lines.size();){
         auto A = split_ints(lines[i]);
@@ -52,7 +53,7 @@ inline BMPPositional load_bmp_dat(const std::string& path){
             T.push_back(std::move(Tb));
             i += 2;
         }else{
-            // skip singleton
+            
             ++i;
         }
     }
@@ -61,8 +62,7 @@ inline BMPPositional load_bmp_dat(const std::string& path){
     auto& last = T.back();
     uint32_t maxv = *std::max_element(last.begin(), last.end());
     if(maxv > 2){
-        // warn but don't fail
-        // throw std::runtime_error("Last T has indices > 2; unexpected for R of size 2");
+        
     }
 
     BMPPositional bmp;
@@ -72,7 +72,7 @@ inline BMPPositional load_bmp_dat(const std::string& path){
 }
 
 inline std::vector<uint8_t> traverse_all_outputs(const BMPPositional& bmp){
-    // Start from leftmost layer 0
+    // Start from leftmost layer 0: rows_0 = len(T[0])
     size_t n0 = bmp.T.front().size();
     std::vector<uint8_t> out(n0, 0);
     for(size_t r=0;r<n0;++r){
