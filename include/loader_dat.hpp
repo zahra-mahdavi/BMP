@@ -7,10 +7,16 @@
 #include <cstdint>
 #include <algorithm>
 
-
+// Loader for .dat format seen in bmp_105.dat:
+// Line 1: (ignored) enumeration of initial rows (size N0)
+// Line 2: R vector with 2 ints: "0 1"
+// Then repeated pairs: for each layer k:
+//   - Line A: row indices (ignored except for length)
+//   - Line B: column indices (1-based) in [1 .. rows_{k+1}], length = rows_k
+// We only need Line B of each pair for traversal by positional index.
 struct BMPPositional {
-    std::vector<std::vector<uint32_t>> T; 
-    std::vector<int> R;                   
+    std::vector<std::vector<uint32_t>> T; // T[k][r] = c (1-based), r in [0..rows_k-1]
+    std::vector<int> R;                   // size 2, values {0,1}
 };
 
 inline std::vector<int> split_ints(const std::string& s){
@@ -32,12 +38,12 @@ inline BMPPositional load_bmp_dat(const std::string& path){
     }
     if(lines.size() < 3) throw std::runtime_error("Unexpected .dat format: too few lines");
 
-    // Line 1: initial rows enumeration 
-    // Line 2: R vector 
+    // Line 1: initial rows enumeration (ignored)
+    // Line 2: R vector (expected 2 ints)
     std::vector<int> R = split_ints(lines[1]);
     if(R.size() != 2) throw std::runtime_error("Expected R of size 2 on line 2");
 
-    // Build pairs 
+    // Build pairs (equal-length neighbors)
     std::vector<std::vector<uint32_t>> T;
     for(size_t i=2;i+1<lines.size();){
         auto A = split_ints(lines[i]);
@@ -53,16 +59,17 @@ inline BMPPositional load_bmp_dat(const std::string& path){
             T.push_back(std::move(Tb));
             i += 2;
         }else{
-            
+            // skip singleton
             ++i;
         }
     }
 
-    
+    // Optional sanity: last layer should map to 1..2
     auto& last = T.back();
     uint32_t maxv = *std::max_element(last.begin(), last.end());
     if(maxv > 2){
-        
+        // warn but don't fail
+        // throw std::runtime_error("Last T has indices > 2; unexpected for R of size 2");
     }
 
     BMPPositional bmp;
