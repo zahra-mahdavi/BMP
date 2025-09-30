@@ -49,7 +49,8 @@ inline std::vector<uint8_t> compute_via_traversal(const std::vector<PackedMatrix
     return traverse_all(T, x_bits);
 }
 
-
+// Compute output via chained matrix-vector on CPU (boolean semiring).
+// v0 = R; for i = nvars-1..0: v = A_i^{x_i} * v
 inline std::vector<uint8_t> compute_via_cpu_matvec(const std::vector<PackedMatrix>& M0,
                                                    const std::vector<PackedMatrix>& M1,
                                                    const PackedVector& R,
@@ -61,7 +62,7 @@ inline std::vector<uint8_t> compute_via_cpu_matvec(const std::vector<PackedMatri
     return out;
 }
 
-
+// Utility: generate a consistent random row-switch BMP chain with varying dims.
 inline void gen_random_rowswitch_chain(size_t nvars,
                                        size_t left_rows,
                                        size_t right_cols,
@@ -74,7 +75,7 @@ inline void gen_random_rowswitch_chain(size_t nvars,
     for(size_t i=1;i<nvars;++i){
         widths[i] = std::max<size_t>(1, (widths[i-1] + widths[i-1]/3)); // simple growth
     }
-    
+    // Build matrices from left to right where A_i: rows = widths[i], cols = widths[i+1]
     M0.resize(nvars);
     M1.resize(nvars);
     for(size_t i=0;i<nvars;++i){
